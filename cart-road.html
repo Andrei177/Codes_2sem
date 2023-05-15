@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
+    <script>
+      let map, myIcon, polyline, coords;
+      let line = [];
+      let road = [];
+      let size;
+      let name;
+      let count = 0;
+// document.querySelector(".priv").addEventListener("click", function (){ alert('Привет!');} );
+// document.querySelector('.alert').addEventListener('click', () => alert("Привет!"));
+
+      DG.then(function () {
+        map = DG.map("map", {
+          center: [53.20885986324375, 50.1291561126709],
+          zoom: 16,
+        });
+
+        DG.marker([53.389683, 50.172828])
+          .addTo(map)
+          .bindPopup(
+            '<div class = "foto">Горнолыжный комплекс СОК <br> <a href="https://vk.com/glksok" target="_blank"><img src="https://www.lifejourney.club/wp-content/uploads/2015/01/glinka-map.jpg.pagespeed.ce.LP0q8jvtHi.jpg" alt=""></a></div>'
+          );
+        clickedElement = document.getElementById("clicked_element");
+        clickedButton = document.getElementById("button-clear");
+        clickedButtonLast = document.getElementById("button-last-clear");
+        clickedButtonSave = document.getElementById("button-save");
+        coords = [];
+
+        map.on("click", function (e) {
+          coords.push([e.latlng.lat, e.latlng.lng]);
+          polyline = DG.polyline(coords, { color: "blue" }).addTo(map);
+
+          line.push(polyline);
+
+          clickedElement.innerHTML =
+            "[" + e.latlng.lat + ", " + e.latlng.lng + "]";
+        });
+
+        clickedButton.onclick = () => {
+          for (let i = 0; i < line.length; i++) {
+            line[i].remove();
+          }
+          coords = [];
+        };
+        clickedButtonLast.onclick = () => {
+          size = line.length;
+          for (let i = size - 1; i < size; i++) {
+            line[i].remove();
+            coords.pop();
+            line.length--;
+          }
+        };
+        clickedButtonSave.onclick = () => {
+          count++;
+          for (let coor of coords) {
+            road.push(coords[coor]);
+          }
+          name = prompt("Имя маршрута?", 1);
+          let div = document.createElement("div");
+          div.className = "alert";
+          div.innerHTML = name;
+
+          document.body.append(div);
+        };
+        document.querySelector("#button").addEventListener("click", () =>  alert('Привет!'));
+        document.querySelector(".alert").addEventListener("click", () => alert("Привет!"));
+        // создаем ломаную из массива географических точек
+        //polyline = DG.polyline(coords, {color: 'blue'}).addTo(map);
+
+        // подстраиваем центр карты и масштаб, чтобы ломаную было видно
+        map.fitBounds(polyline.getBounds());
+      });
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+      #map {
+        margin: 0 auto;
+      }
+      .foto {
+        text-align: center;
+        color: #fff;
+        font-family: Arial;
+      }
+      img {
+        height: 100px;
+        margin: 0 auto;
+      }
+      .alert {
+        font-size: 25px;
+        background-color: green;
+        text-align: center;
+        width: 10%;
+        border-radius: 30px;
+        transition: 1.5s;
+        cursor: pointer;
+        margin: 10px 0;
+      }
+      .alert:hover {
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <body>
+      Вы кликнули в: <span id="clicked_element">никуда</span>
+      <div id="map" style="width: 70%; height: 500px"></div>
+      <input id="button-clear" type="button" value="Стереть маршрут" />
+      <input
+        id="button-last-clear"
+        type="button"
+        value="Стереть последнюю линию"
+      />
+      <input id="button-save" type="button" value="Сохранить маршрут" />
+    </body>
+  </body>
+</html>
